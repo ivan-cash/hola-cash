@@ -1,25 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
-import './App.css';
+import "./App.css";
 
-import { generateAntiFraudHeaders } from './utils/headers';
+import { generateAntiFraudHeaders } from "./utils/headers";
 
-const PUBLIC_KEY = 'pub_sandbox_6JYHNKY3.LxTGhI4SgiWGVODNr9Q2tLaiurhxbpcY';
-const holacashApiBaseUrl = "https://sandbox.api.holacash.mx/v2";
+const PUBLIC_KEY = "pub_play_8BkXU0F5.yB1nA48lz8YAEgCxQ6uWqPriLNmJacaH";
+const holacashApiBaseUrl = "https://api-v2.play.holacash.mx/v2";
 
 function App() {
   const [pokemons, setPokemons] = useState({});
@@ -29,16 +29,18 @@ function App() {
   const [success, setSuccess] = useState(false);
   const [details, setDetails] = useState();
 
-  const ref= useRef(null);
+  const ref = useRef(null);
 
   const getPokemons = async () => {
     try {
-      const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100&offset=0').then(response => response.json());
+      const response = await fetch(
+        "https://pokeapi.co/api/v2/pokemon?limit=100&offset=0"
+      ).then((response) => response.json());
       setPokemons(response);
     } catch (error) {
-     console.log(error); 
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     getPokemons();
@@ -50,26 +52,24 @@ function App() {
     setOpen(true);
     const headers = await generateAntiFraudHeaders();
     try {
-      const res = await fetch(
-        holacashApiBaseUrl + "/order",
-        {
-          method: 'POST',
-          headers: {
-            "X-Api-Client-Key": PUBLIC_KEY,
-            'X-Cash-Anti-Fraud-Metadata': headers,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            order_total_amount: {
-              amount: 15000,
-              currency_code: "MXN",
-            },
-            description: 'Adopción: ' + pokemon.name.replace(/(^\w|\s\w)/g, m => m.toUpperCase()),
-          })
+      const res = await fetch(holacashApiBaseUrl + "/order", {
+        method: "POST",
+        headers: {
+          "X-Api-Client-Key": PUBLIC_KEY,
+          "X-Cash-Anti-Fraud-Metadata": headers,
+          "Content-Type": "application/json",
         },
-      ).then(response => response.json());
+        body: JSON.stringify({
+          order_total_amount: {
+            amount: 15000,
+            currency_code: "MXN",
+          },
+          description:
+            "Adopción: " +
+            pokemon.name.replace(/(^\w|\s\w)/g, (m) => m.toUpperCase()),
+        }),
+      }).then((response) => response.json());
 
-      
       if (res?.order_information?.order_id) {
         // eslint-disable-next-line no-undef
         HolaCashCheckout.configure(
@@ -77,15 +77,14 @@ function App() {
             order_id: res.order_information.order_id,
             // hints are optional
             hints: {
-                first_name: 'John',
-                last_name: 'Doe',
-                second_last_name: 'Doe',
-                email: 'john.doe@gmail.com',
-                phone: '13212312412'
+              first_name: "John",
+              last_name: "Doe",
+              second_last_name: "Doe",
+              email: "john.doe@gmail.com",
+              phone: "13212312412",
             },
           },
           {
-
             // onSuccess happens when a charge is created correctly.
             onSuccess: (res) => {
               setSuccess(true);
@@ -106,7 +105,7 @@ function App() {
             onEmailEntered: (email) => console.log(email),
 
             // onCheckoutStart is called when the checkout page is presented
-            onCheckoutStart: () => console.log('checkout started'),
+            onCheckoutStart: () => console.log("checkout started"),
 
             // We will use the check callback to determine if Cash Pay should proceed.
             // This must return a boolean
@@ -118,15 +117,17 @@ function App() {
       }
       setLoading(false);
     } catch (error) {
-      console.log('error', error);
+      console.log("error", error);
       setLoading(false);
     }
   };
 
   const getPokemonDetails = async () => {
-    const pokemonDetails = await fetch('https://pokeapi.co/api/v2/pokemon/' + selected.name).then(response => response.json());
+    const pokemonDetails = await fetch(
+      "https://pokeapi.co/api/v2/pokemon/" + selected.name
+    ).then((response) => response.json());
     setDetails(pokemonDetails);
-  }
+  };
 
   return (
     <Container maxWidth="xl" className="App">
@@ -134,7 +135,7 @@ function App() {
         <h1 className="title">Adopta un pokemon</h1>
       </header>
       <Grid container spacing={3}>
-        {pokemons?.results?.map(pokemon => (
+        {pokemons?.results?.map((pokemon) => (
           <Grid
             container
             direction="row"
@@ -152,16 +153,22 @@ function App() {
               <CardMedia
                 component="img"
                 height="140"
-                image={'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + pokemon.url.split('/')[pokemon.url.split('/').length-2] + '.png'}
+                image={
+                  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" +
+                  pokemon.url.split("/")[pokemon.url.split("/").length - 2] +
+                  ".png"
+                }
                 alt={pokemon.name}
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
-                  {pokemon.name.replace(/(^\w|\s\w)/g, m => m.toUpperCase())}
+                  {pokemon.name.replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" onClick={() => onClick(pokemon)}>Adóptame</Button>
+                <Button size="small" onClick={() => onClick(pokemon)}>
+                  Adóptame
+                </Button>
               </CardActions>
             </Card>
           </Grid>
@@ -174,13 +181,15 @@ function App() {
         aria-describedby="alert-checkout-description"
       >
         <DialogTitle id="alert-checkout-title">
-          Adoptar a {selected?.name.replace(/(^\w|\s\w)/g, m => m.toUpperCase())}?
+          Adoptar a{" "}
+          {selected?.name.replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}?
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-checkout-description">
             <b>Adoptar un pokemon es una enorme responsabilidad.</b>
             <br />
-            Recuerda también que el proceso de adopción tiene un costo de recuperación de $150.00 MXN
+            Recuerda también que el proceso de adopción tiene un costo de
+            recuperación de $150.00 MXN
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -213,15 +222,13 @@ function App() {
         aria-labelledby="alert-success-title"
         aria-describedby="alert-success-description"
       >
-        <DialogTitle id="alert-success-title">
-          ¡Felicidades!
-        </DialogTitle>
+        <DialogTitle id="alert-success-title">¡Felicidades!</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-success-description">
             Ahora eres el orgulloso dueño de un {selected?.name}
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
-                  <CardMedia
+                <CardMedia
                   component="img"
                   height="140"
                   image={details?.sprites?.front_default}
@@ -238,9 +245,9 @@ function App() {
               </Grid>
             </Grid>
             <b>Más detalles de tu pokemon:</b> <br />
-            Experiencia base: {details?.base_experience} <br/>
-            Altura: {details?.height} <br/>
-            Peso: {details?.weight} <br/> <br/>
+            Experiencia base: {details?.base_experience} <br />
+            Altura: {details?.height} <br />
+            Peso: {details?.weight} <br /> <br />
             Ven a recoger a tu nuevo pokemon a tu Centro Pokemon más cercano
           </DialogContentText>
         </DialogContent>
@@ -256,7 +263,11 @@ function App() {
           </Button>
         </DialogActions>
       </Dialog>
-      <div id="instant-holacash-checkout-button" ref={ref} className="checkoutButton">
+      <div
+        id="instant-holacash-checkout-button"
+        ref={ref}
+        className="checkoutButton"
+      >
         <object
           id="checkout-button"
           data={`${holacashApiBaseUrl}/checkout/button?public_key=${PUBLIC_KEY}`}
